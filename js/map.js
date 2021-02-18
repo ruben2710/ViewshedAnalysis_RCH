@@ -79,17 +79,20 @@ require([
                  */
 
                 gpViewshed.outSpatialReference = mapMain.spatialReference;
+
+
+                 /*      
+                * Step: add a print widget that used the prepared templates
+                 */
+                var widgetTemplates = new print({
+                 map : mapMain,
+                 Url : "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",
+                 templates : myTemplates
+                }, divPrint)
+                widgetPrint.startup();
             });
 
-            /*      
-         * Step: add a print widget that used the prepared templates
-            */
-            var widgetTemplates = new print({
-                map : mapMain,
-                Url : "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",
-                templates : myTemplates
-            }, divPrint)
-            widgetPrint.startup();
+           
         
 
             // Collect the input observation point
