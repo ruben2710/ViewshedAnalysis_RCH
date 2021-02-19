@@ -1,4 +1,3 @@
-  
 var mapMain;
 
 // @formatter:off
@@ -14,11 +13,13 @@ require([
         "esri/tasks/Geoprocessor",
         "esri/tasks/FeatureSet",
         "esri/tasks/LinearUnit",
+        "esri/tasks/PrintTemplate",
+        "esri/dijit/Print",
         "dojo/ready",
         "dojo/parser",
         "dojo/on",
         "dojo/_base/array"],
-    function (Map, Draw, Graphic, graphicsUtils, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, Color, Geoprocessor, FeatureSet, LinearUnit,
+    function (Map, Draw, Graphic, graphicsUtils, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, Color, Geoprocessor, FeatureSet, LinearUnit, PrintTemplate, Print,
               ready, parser, on, array) {
 // @formatter:on
 
@@ -28,6 +29,39 @@ require([
             // Parse DOM nodes decorated with the data-dojo-type attribute
             parser.parse();
             
+            // create an array of JSON objects that will be used to create print templates
+            var myLayouts = [{
+                "name" : "Letter ANSI A Landscape",
+                "label" : "Landscape (PDF)",
+                "format" : "pdf",
+                "options" : {
+                "legendLayers" : [], // empty array means no legend
+                "scalebarUnit" : "Miles",
+                "titleText" : "Landscape PDF"
+                }
+        
+            }, {
+                "name" : "Letter ANSI A Portrait",
+                "label" : "Portrait (JPG)",
+                "format" : "jpg",
+                "options" : {
+                "legendLayers" : [],
+                "scaleBarUnit" : "Miles",
+                "titleText" : "Portrait JPG"
+                }
+            }];
+        
+            // create the print templates, could also use dojo.map
+            var myTemplates = [];
+            dojo.forEach(myLayouts, function(lo) {
+                var t = new PrintTemplate();
+                t.layout = lo.name;
+                t.label = lo.label;
+                t.format = lo.format;
+                t.layoutOptions = lo.options;
+                myTemplates.push(t);
+            });
+
             // Create the map
             mapMain = new Map("divMap", {
                 basemap: "topo",
@@ -45,6 +79,16 @@ require([
                  * Step: Set the spatial reference for output geometries
                  */
                 gpViewshed.outSpatialReference = mapMain.spatialReference;
+                
+                /*
+                * Step: Add a print Widget that uses the prepared templates
+                */
+                var widgetPrint = new Print ({
+                    map : mapMain,
+                    url: "https://utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task/execute",
+                    templates : myTemplates
+                }, divPrint);
+                widgetPrint.startup();
 
             });
 
