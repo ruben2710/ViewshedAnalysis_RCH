@@ -1,3 +1,4 @@
+  
 var mapMain;
 
 // @formatter:off
@@ -13,13 +14,11 @@ require([
         "esri/tasks/Geoprocessor",
         "esri/tasks/FeatureSet",
         "esri/tasks/LinearUnit",
-        "esri.tasks.PrintTemplate",
-        "esri/dijit/Print",
         "dojo/ready",
         "dojo/parser",
         "dojo/on",
         "dojo/_base/array"],
-    function (Map, Draw, Graphic, graphicsUtils, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, Color,Geoprocessor,FeatureSet,LinearUnit,PrintTemplate,Print,
+    function (Map, Draw, Graphic, graphicsUtils, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, Color, Geoprocessor, FeatureSet, LinearUnit,
               ready, parser, on, array) {
 // @formatter:on
 
@@ -28,39 +27,7 @@ require([
 
             // Parse DOM nodes decorated with the data-dojo-type attribute
             parser.parse();
-                             
-            // create an array of JSON objects that will be used to create print templates
-            var myLayouts = [{
-                "name" : "Letter ANSI A Landscape",
-                "label" : "Landscape (PDF)",
-                "format" : "pdf",
-                "options" : {
-                    "legendLayers" : [], // empty array means no legend
-                    "scalebarUnit" : "Miles", 
-                    "titleText" : "Landscape PDF"
-                }
-            }, {
-                "name" : "Letter ANSI A Portrait",
-                "label" : "Portrait (JPG)",
-                "format" : "jpg",
-                "options" : {
-                    "legendLayers" : [],
-                    "scaleBarUnit" : "Miles",
-                    "titleText" : "Portrait JPG"
-                }
-            }];
-
-            // create the print templates, could also use dojo.map
-                var myTemplates = [];
-                dojo.forEach(myLayouts, function(lo) {
-                    var t = new PrintTemplate();
-                    t.layout = lo.name;
-                    t.label = lo.label;
-                    t.format = lo.format;
-                    t.layoutOptions = lo.options;
-                    myTemplates.push(t);
-                }); 
-
+            
             // Create the map
             mapMain = new Map("divMap", {
                 basemap: "topo",
@@ -71,29 +38,15 @@ require([
             /*
              * Step: Construct the Geoprocessor
              */
-            var gpViewshed = new Geoprocessor ("http://sampleserver6.arcgisonline.com/arcgis/rest/services/Elevation/ESRI_Elevation_World/GPServer/Viewshed");
+            var gpViewshed = new Geoprocessor("http://sampleserver6.arcgisonline.com/arcgis/rest/services/Elevation/ESRI_Elevation_World/GPServer/Viewshed");
 
             mapMain.on("load", function () {
                 /*
                  * Step: Set the spatial reference for output geometries
                  */
-
                 gpViewshed.outSpatialReference = mapMain.spatialReference;
 
-
-                 /*      
-                * Step: add a print widget that used the prepared templates
-                 */
-                var widgetTemplates = new print({
-                 map : mapMain,
-                 Url : "https://utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task/execute",
-                 templates : myTemplates
-                }, divPrint)
-                widgetPrint.startup();
             });
-
-           
-        
 
             // Collect the input observation point
             var tbDraw = new Draw(mapMain);
@@ -118,7 +71,7 @@ require([
                 /*
                  * Step: Prepare the first input parameter
                  */
-                var fsInputPoint = new FeatureSet(); 
+                var fsInputPoint = new FeatureSet();
                 fsInputPoint.features.push(graphicViewpoint);
 
                 /*
@@ -127,14 +80,13 @@ require([
                 var luDistance = new LinearUnit();
                 luDistance.distance = 5;
                 luDistance.units = "esriMiles";
-
                 /*
                  * Step: Build the input parameters into a JSON-formatted object
                  */
                 var gpParams = {
                     "Input_Observation_Point" : fsInputPoint,
                     "Viewshed_Distance" : luDistance
-                  };
+                };
 
                 /*
                  * Step: Wire and execute the Geoprocessor
@@ -163,9 +115,9 @@ require([
                     /*
                      * Step: Symbolize and add each graphic to the map's graphics layer
                      */
-
                     feature.setSymbol(sfsResultPolygon);
                     mapMain.graphics.add(feature);
+
                 });
 
                 // update the map extent
